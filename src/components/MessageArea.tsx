@@ -1,20 +1,39 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Plus, Paperclip } from 'lucide-react';
+import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Paperclip } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+import { useChannels } from '@/hooks/useChannels';
+import { useMessages } from '@/hooks/useMessages';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChannelWelcome } from './ChannelWelcome';
 import { MessageItem } from './MessageItem';
 
 export const MessageArea = () => {
-  const { activeChannel, channels, messages } = useWorkspaceStore();
+  const { activeChannel } = useWorkspaceStore();
+  const { channels } = useChannels();
+  const { user } = useAuth();
+  const { messages, loading, sendMessage } = useMessages(activeChannel);
   const [messageInput, setMessageInput] = useState('');
 
   const channel = channels.find((c) => c.id === activeChannel);
-  const channelMessages = messages.filter((m) => m.channelId === activeChannel);
 
-  if (!channel) return null;
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageInput.trim() || !user) return;
+
+    await sendMessage(messageInput, user.id);
+    setMessageInput('');
+  };
+
+  if (!channel) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Select a channel to start messaging</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col h-screen">
@@ -52,7 +71,11 @@ export const MessageArea = () => {
 
       {/* Messages */}
       <ScrollArea className="flex-1">
-        {channelMessages.length <= 1 ? (
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-muted-foreground">Loading messages...</div>
+          </div>
+        ) : messages.length === 0 ? (
           <ChannelWelcome channelName={channel.name} />
         ) : (
           <div className="p-5 space-y-2 max-w-6xl">
@@ -76,11 +99,11 @@ export const MessageArea = () => {
             )}
 
             {/* Messages */}
-            {channelMessages.map((message, index) => {
-              const prevMessage = channelMessages[index - 1];
+            {messages.map((message, index) => {
+              const prevMessage = messages[index - 1];
               const showAvatar = !prevMessage || 
-                prevMessage.userId !== message.userId ||
-                new Date(message.timestamp).getTime() - new Date(prevMessage.timestamp).getTime() > 300000;
+                prevMessage.user_id !== message.user_id ||
+                new Date(message.created_at).getTime() - new Date(prevMessage.created_at).getTime() > 300000;
 
               return (
                 <MessageItem
@@ -96,56 +119,65 @@ export const MessageArea = () => {
 
       {/* Message Input */}
       <div className="p-5 border-t border-border flex-shrink-0">
-        <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-          {/* Formatting Toolbar */}
-          <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-border">
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <Bold className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <Italic className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <Link2 className="h-3.5 w-3.5" />
-            </Button>
-            <div className="w-px h-4 bg-border mx-1" />
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <ListOrdered className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <Code className="h-3.5 w-3.5" />
-            </Button>
-            <div className="flex-1" />
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <Smile className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <AtSign className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-              <Paperclip className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-
-          {/* Input Field */}
-          <div className="relative">
-            <input
-              type="text"
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              placeholder={`Message #${channel.name}`}
-              className="w-full px-3 py-3 bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground"
-            />
-            {messageInput && (
-              <Button
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-primary hover:bg-primary/90 rounded"
-              >
-                <Send className="h-4 w-4" />
+        <form onSubmit={handleSendMessage}>
+          <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            {/* Formatting Toolbar */}
+            <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-border">
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <Bold className="h-3.5 w-3.5" />
               </Button>
-            )}
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <Italic className="h-3.5 w-3.5" />
+              </Button>
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <Link2 className="h-3.5 w-3.5" />
+              </Button>
+              <div className="w-px h-4 bg-border mx-1" />
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <ListOrdered className="h-3.5 w-3.5" />
+              </Button>
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <Code className="h-3.5 w-3.5" />
+              </Button>
+              <div className="flex-1" />
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <Smile className="h-3.5 w-3.5" />
+              </Button>
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <AtSign className="h-3.5 w-3.5" />
+              </Button>
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+                <Paperclip className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+
+            {/* Input Field */}
+            <div className="relative">
+              <input
+                type="text"
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                placeholder={`Message #${channel.name}`}
+                className="w-full px-3 py-3 bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(e);
+                  }
+                }}
+              />
+              {messageInput && (
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-primary hover:bg-primary/90 rounded"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

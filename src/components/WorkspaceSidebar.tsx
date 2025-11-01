@@ -1,12 +1,26 @@
 import { motion } from 'framer-motion';
-import { Hash, MessageSquare, Star, ChevronDown, Plus, Settings, Edit2, Bell, Search, Users, File, Workflow } from 'lucide-react';
+import { Hash, Plus, ChevronDown, MessageSquare, Search, Settings, Bell, Star, LogOut } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+import { useChannels } from '@/hooks/useChannels';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 export const WorkspaceSidebar = () => {
-  const { channels, activeChannel, setActiveChannel, sidebarCollapsed } = useWorkspaceStore();
+  const { activeChannel, setActiveChannel, sidebarCollapsed } = useWorkspaceStore();
+  const { channels, loading: channelsLoading } = useChannels();
+  const { user, signOut } = useAuth();
+  const { profile } = useProfile(user?.id);
+
+  // Set first channel as active on mount
+  useEffect(() => {
+    if (channels.length > 0 && !activeChannel) {
+      setActiveChannel(channels[0].id);
+    }
+  }, [channels, activeChannel, setActiveChannel]);
 
   if (sidebarCollapsed) {
     return (
@@ -21,6 +35,14 @@ export const WorkspaceSidebar = () => {
           </div>
         </div>
       </motion.aside>
+    );
+  }
+
+  if (channelsLoading) {
+    return (
+      <div className="w-[260px] bg-[hsl(var(--slack-purple))] border-r border-[hsl(var(--slack-purple-active))] flex items-center justify-center">
+        <div className="text-[hsl(var(--slack-text-secondary))]">Loading...</div>
+      </div>
     );
   }
 
@@ -123,11 +145,6 @@ export const WorkspaceSidebar = () => {
                       </div>
                     )}
                     <span className="flex-1 text-left truncate">{channel.name}</span>
-                    {channel.unread && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-destructive text-[10px] font-bold min-w-[18px] text-center">
-                        {channel.unread}
-                      </span>
-                    )}
                   </button>
                 ))}
                 <button className="w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-[hsl(var(--slack-text-secondary))]">
@@ -161,19 +178,33 @@ export const WorkspaceSidebar = () => {
 
       {/* User Profile */}
       <div className="p-2 border-t border-[hsl(var(--slack-purple-active))]">
-        <button className="w-full flex items-center gap-2.5 px-2 py-2 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[15px]">
-          <div className="w-9 h-9 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-lg border border-primary/30">
-            👤
+        <div className="flex items-center gap-2.5 px-2 py-2">
+          <div className="w-9 h-9 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-lg border border-primary/30 overflow-hidden">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              '👤'
+            )}
           </div>
-          <div className="flex-1 text-left">
-            <div className="font-black text-foreground text-[15px]">Avi</div>
+          <div className="flex-1 text-left min-w-0">
+            <div className="font-black text-foreground text-[15px] truncate">
+              {profile?.display_name || profile?.username || 'User'}
+            </div>
             <div className="text-xs text-[hsl(var(--slack-text-muted))] flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-green-500"></span>
               <span>Active</span>
             </div>
           </div>
-          <Settings className="h-4 w-4 text-[hsl(var(--slack-text-muted))]" />
-        </button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 flex-shrink-0 text-[hsl(var(--slack-text-muted))] hover:text-foreground hover:bg-[hsl(var(--slack-purple-hover))]"
+            onClick={signOut}
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </motion.aside>
   );

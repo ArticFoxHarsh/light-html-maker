@@ -14,41 +14,40 @@ export type Database = {
   }
   public: {
     Tables: {
-      channel_members: {
+      attachments: {
         Row: {
-          channel_id: string | null
+          created_at: string | null
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          file_url: string
           id: string
-          joined_at: string | null
-          role: string | null
-          user_id: string | null
+          message_id: string
         }
         Insert: {
-          channel_id?: string | null
+          created_at?: string | null
+          file_name: string
+          file_size?: number | null
+          file_type?: string | null
+          file_url: string
           id?: string
-          joined_at?: string | null
-          role?: string | null
-          user_id?: string | null
+          message_id: string
         }
         Update: {
-          channel_id?: string | null
+          created_at?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string
           id?: string
-          joined_at?: string | null
-          role?: string | null
-          user_id?: string | null
+          message_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "channel_members_channel_id_fkey"
-            columns: ["channel_id"]
+            foreignKeyName: "attachments_message_id_fkey"
+            columns: ["message_id"]
             isOneToOne: false
-            referencedRelation: "channels"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "channel_members_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
@@ -59,119 +58,57 @@ export type Database = {
           created_by: string | null
           description: string | null
           id: string
-          is_private: boolean | null
           name: string
+          section: string | null
           type: string
-          updated_at: string | null
-          workspace_id: string | null
         }
         Insert: {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
-          is_private?: boolean | null
           name: string
+          section?: string | null
           type: string
-          updated_at?: string | null
-          workspace_id?: string | null
         }
         Update: {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
-          is_private?: boolean | null
           name?: string
+          section?: string | null
           type?: string
-          updated_at?: string | null
-          workspace_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "channels_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "channels_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      file_attachments: {
-        Row: {
-          created_at: string | null
-          file_name: string
-          file_size: number | null
-          file_type: string | null
-          file_url: string
-          id: string
-          message_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          file_name: string
-          file_size?: number | null
-          file_type?: string | null
-          file_url: string
-          id?: string
-          message_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          file_name?: string
-          file_size?: number | null
-          file_type?: string | null
-          file_url?: string
-          id?: string
-          message_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "file_attachments_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       messages: {
         Row: {
-          channel_id: string | null
+          channel_id: string
           content: string
           created_at: string | null
-          edited_at: string | null
           id: string
-          parent_message_id: string | null
+          parent_id: string | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
-          channel_id?: string | null
+          channel_id: string
           content: string
           created_at?: string | null
-          edited_at?: string | null
           id?: string
-          parent_message_id?: string | null
+          parent_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
-          channel_id?: string | null
+          channel_id?: string
           content?: string
           created_at?: string | null
-          edited_at?: string | null
           id?: string
-          parent_message_id?: string | null
+          parent_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -182,17 +119,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "messages_parent_message_id_fkey"
-            columns: ["parent_message_id"]
+            foreignKeyName: "messages_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -203,9 +133,6 @@ export type Database = {
           created_at: string | null
           display_name: string | null
           id: string
-          status: string | null
-          status_message: string | null
-          updated_at: string | null
           username: string
         }
         Insert: {
@@ -213,9 +140,6 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           id: string
-          status?: string | null
-          status_message?: string | null
-          updated_at?: string | null
           username: string
         }
         Update: {
@@ -223,9 +147,6 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           id?: string
-          status?: string | null
-          status_message?: string | null
-          updated_at?: string | null
           username?: string
         }
         Relationships: []
@@ -235,22 +156,22 @@ export type Database = {
           created_at: string | null
           emoji: string
           id: string
-          message_id: string | null
-          user_id: string | null
+          message_id: string
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           emoji: string
           id?: string
-          message_id?: string | null
-          user_id?: string | null
+          message_id: string
+          user_id: string
         }
         Update: {
           created_at?: string | null
           emoji?: string
           id?: string
-          message_id?: string | null
-          user_id?: string | null
+          message_id?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -258,51 +179,6 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      workspaces: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          icon: string | null
-          id: string
-          name: string
-          slug: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          slug: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          slug?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workspaces_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
