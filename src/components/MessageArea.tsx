@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Paperclip } from 'lucide-react';
+import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Paperclip, Menu } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useChannels } from '@/hooks/useChannels';
 import { useMessages } from '@/hooks/useMessages';
@@ -11,7 +11,7 @@ import { ChannelWelcome } from './ChannelWelcome';
 import { MessageItem } from './MessageItem';
 
 export const MessageArea = () => {
-  const { activeChannel } = useWorkspaceStore();
+  const { activeChannel, toggleSidebar, sidebarCollapsed } = useWorkspaceStore();
   const { channels } = useChannels();
   const { user } = useAuth();
   const { messages, loading, sendMessage } = useMessages(activeChannel);
@@ -44,6 +44,16 @@ export const MessageArea = () => {
         className="h-[49px] border-b border-border flex items-center justify-between px-4 bg-card flex-shrink-0"
       >
         <div className="flex items-center gap-2">
+          {sidebarCollapsed && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 mr-2"
+              onClick={toggleSidebar}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
           {channel.type === 'channel' ? (
             <Hash className="h-[18px] w-[18px] text-muted-foreground" />
           ) : (

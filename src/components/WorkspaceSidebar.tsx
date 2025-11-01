@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Hash, Plus, ChevronDown, MessageSquare, Search, Settings, Bell, Star, LogOut } from 'lucide-react';
+import { Hash, Plus, ChevronDown, ChevronRight, MessageSquare, Search, Settings, Bell, Star, LogOut } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useChannels } from '@/hooks/useChannels';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,13 +7,16 @@ import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const WorkspaceSidebar = () => {
-  const { activeChannel, setActiveChannel, sidebarCollapsed } = useWorkspaceStore();
+  const { activeChannel, setActiveChannel, sidebarCollapsed, toggleSidebar } = useWorkspaceStore();
   const { channels, loading: channelsLoading } = useChannels();
   const { user, signOut } = useAuth();
   const { profile } = useProfile(user?.id);
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
 
   // Set first channel as active on mount
   useEffect(() => {
@@ -21,6 +24,13 @@ export const WorkspaceSidebar = () => {
       setActiveChannel(channels[0].id);
     }
   }, [channels, activeChannel, setActiveChannel]);
+
+  const toggleSection = (section: string) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   if (sidebarCollapsed) {
     return (
@@ -87,71 +97,103 @@ export const WorkspaceSidebar = () => {
         <div className="px-2 py-2">
           {/* Quick Actions */}
           <div className="space-y-0.5 mb-3">
-            <button className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px]">
+            <Button
+              variant="ghost"
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal"
+              onClick={() => navigate('/threads')}
+            >
               <MessageSquare className="h-4 w-4" />
               <span>Threads</span>
-            </button>
-            <button className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px]">
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal"
+              onClick={() => navigate('/activity')}
+            >
               <Bell className="h-4 w-4" />
               <span>Activity</span>
-            </button>
-            <button className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px]">
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal"
+              onClick={() => navigate('/starred')}
+            >
               <Star className="h-4 w-4" />
               <span>Starred</span>
-            </button>
+            </Button>
           </div>
 
           {/* Huddles */}
           <div className="mb-3">
-            <button className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold">
+            <Button
+              variant="ghost"
+              className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold h-auto"
+              onClick={() => navigate('/huddles')}
+            >
               <span>Huddles</span>
-            </button>
+            </Button>
           </div>
 
           {/* Directories */}
           <div className="mb-3">
-            <button className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold">
+            <Button
+              variant="ghost"
+              className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold h-auto"
+              onClick={() => navigate('/directories')}
+            >
               <span>Directories</span>
-            </button>
+            </Button>
           </div>
 
           {/* Sections */}
           {Object.entries(channelsBySection).map(([section, sectionChannels]) => (
             <div key={section} className="mb-3">
-              <button className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold group">
+              <button 
+                onClick={() => toggleSection(section)}
+                className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold group"
+              >
                 <div className="flex items-center gap-1">
-                  <ChevronDown className="h-3 w-3" />
+                  {collapsedSections[section] ? (
+                    <ChevronRight className="h-3 w-3" />
+                  ) : (
+                    <ChevronDown className="h-3 w-3" />
+                  )}
                   <span>{section}</span>
                 </div>
                 <Plus className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
               </button>
-              <div className="space-y-0.5 mt-0.5">
-                {sectionChannels.map((channel) => (
-                  <button
-                    key={channel.id}
-                    onClick={() => setActiveChannel(channel.id)}
-                    className={cn(
-                      'w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] group transition-colors',
-                      activeChannel === channel.id
-                        ? 'bg-[hsl(var(--slack-cyan))] text-foreground font-bold'
-                        : 'text-[hsl(var(--slack-text-secondary))] hover:bg-[hsl(var(--slack-purple-hover))]'
-                    )}
-                  >
-                    {channel.type === 'channel' ? (
-                      <Hash className="h-[15px] w-[15px]" />
-                    ) : (
-                      <div className="w-5 h-5 rounded bg-[hsl(var(--slack-purple-active))] flex items-center justify-center text-xs">
-                        👤
-                      </div>
-                    )}
-                    <span className="flex-1 text-left truncate">{channel.name}</span>
+              {!collapsedSections[section] && (
+                <div className="space-y-0.5 mt-0.5">
+                  {sectionChannels.map((channel) => (
+                    <button
+                      key={channel.id}
+                      onClick={() => {
+                        setActiveChannel(channel.id);
+                        navigate('/');
+                      }}
+                      className={cn(
+                        'w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] group transition-colors',
+                        activeChannel === channel.id
+                          ? 'bg-[hsl(var(--slack-cyan))] text-foreground font-bold'
+                          : 'text-[hsl(var(--slack-text-secondary))] hover:bg-[hsl(var(--slack-purple-hover))]'
+                      )}
+                    >
+                      {channel.type === 'channel' ? (
+                        <Hash className="h-[15px] w-[15px]" />
+                      ) : (
+                        <div className="w-5 h-5 rounded bg-[hsl(var(--slack-purple-active))] flex items-center justify-center text-xs">
+                          👤
+                        </div>
+                      )}
+                      <span className="flex-1 text-left truncate">{channel.name}</span>
+                    </button>
+                  ))}
+                  <button className="w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-[hsl(var(--slack-text-secondary))]">
+                    <Plus className="h-4 w-4" />
+                    <span>Add channels</span>
                   </button>
-                ))}
-                <button className="w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-[hsl(var(--slack-text-secondary))]">
-                  <Plus className="h-4 w-4" />
-                  <span>Add channels</span>
-                </button>
-              </div>
+                </div>
+              )}
             </div>
           ))}
 
