@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Paperclip, Menu } from 'lucide-react';
+import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Menu } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useChannels } from '@/hooks/useChannels';
 import { useMessages } from '@/hooks/useMessages';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChannelWelcome } from './ChannelWelcome';
 import { MessageItem } from './MessageItem';
+import { FileUpload } from './FileUpload';
 
 export const MessageArea = () => {
   const { activeChannel, toggleSidebar, sidebarCollapsed } = useWorkspaceStore();
@@ -16,15 +17,26 @@ export const MessageArea = () => {
   const { user } = useAuth();
   const { messages, loading, sendMessage } = useMessages(activeChannel);
   const [messageInput, setMessageInput] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const channel = channels.find((c) => c.id === activeChannel);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageInput.trim() || !user) return;
+    if ((!messageInput.trim() && selectedFiles.length === 0) || !user) return;
 
+    // TODO: Upload files to storage before sending message
     await sendMessage(messageInput, user.id);
     setMessageInput('');
+    setSelectedFiles([]);
+  };
+
+  const handleFileSelect = (files: File[]) => {
+    setSelectedFiles(prev => [...prev, ...files]);
+  };
+
+  const handleFileRemove = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   if (!channel) {
@@ -156,9 +168,11 @@ export const MessageArea = () => {
               <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
                 <AtSign className="h-3.5 w-3.5" />
               </Button>
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-                <Paperclip className="h-3.5 w-3.5" />
-              </Button>
+              <FileUpload
+                onFileSelect={handleFileSelect}
+                selectedFiles={selectedFiles}
+                onFileRemove={handleFileRemove}
+              />
             </div>
 
             {/* Input Field */}

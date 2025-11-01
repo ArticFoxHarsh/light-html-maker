@@ -84,8 +84,12 @@ export const useMessages = (channelId: string | undefined) => {
           table: 'messages',
           filter: `channel_id=eq.${channelId}`,
         },
-        () => {
-          fetchMessages();
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            setMessages(prev => prev.filter(m => m.id !== payload.old.id));
+          } else {
+            fetchMessages();
+          }
         }
       )
       .subscribe();
