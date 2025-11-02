@@ -6,7 +6,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -86,7 +85,7 @@ const SortableChannelItem = ({
       onMoveToSection={(section) => onMoveToSection(channel.id, section)}
       onDelete={() => onDelete(channel.id, channel.name)}
     >
-      <div
+      <button
         ref={setNodeRef}
         style={style}
         {...attributes}
@@ -107,7 +106,7 @@ const SortableChannelItem = ({
           </div>
         )}
         <span className="flex-1 text-left truncate">{channel.name}</span>
-      </div>
+      </button>
     </ChannelItemContextMenu>
   );
 };
@@ -291,12 +290,14 @@ export const WorkspaceSidebar = () => {
               <MessageSquare className="h-4 w-4" />
               <span>Threads</span>
             </Button>
-          </div>
-
-          <Separator className="mb-3" />
-
-          {/* Starred */}
-          <div className="mb-3">
+            <Button
+              variant="ghost"
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal transition-all"
+              onClick={() => navigate('/activity')}
+            >
+              <Bell className="h-4 w-4" />
+              <span>Activity</span>
+            </Button>
             <Button
               variant="ghost"
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal transition-all"
@@ -306,8 +307,6 @@ export const WorkspaceSidebar = () => {
               <span>Starred</span>
             </Button>
           </div>
-
-          <Separator className="mb-3" />
 
           {/* Huddles */}
           <div className="mb-3">
@@ -335,9 +334,9 @@ export const WorkspaceSidebar = () => {
           {Object.entries(channelsBySection).map(([section, sectionChannels]) => (
             <div key={section} className="mb-3">
               <ChannelContextMenu>
-                <div 
+                <button 
                   onClick={() => toggleSection(section)}
-                  className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold group cursor-pointer"
+                  className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold group"
                 >
                   <div className="flex items-center gap-1">
                     {collapsedSections[section] ? (
