@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
+import { MainSidebar } from './MainSidebar';
 import { WorkspaceSidebar } from './WorkspaceSidebar';
+import { TopBar } from './TopBar';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
@@ -20,8 +22,10 @@ export const Layout = ({ children }: LayoutProps) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+      <MainSidebar />
       <WorkspaceSidebar />
       <main className="flex-1 flex flex-col">
+        <TopBar />
         {children}
       </main>
     </div>

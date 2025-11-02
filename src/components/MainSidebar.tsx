@@ -1,0 +1,59 @@
+import { Home, MessageSquare, Bell, Files, MoreHorizontal } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+const navItems = [
+  { icon: Home, label: 'Home', path: '/' },
+  { icon: MessageSquare, label: 'DMs', path: '/dms' },
+  { icon: Bell, label: 'Activity', path: '/activity' },
+  { icon: Files, label: 'Files', path: '/files' },
+  { icon: MoreHorizontal, label: 'More', path: '/more' },
+];
+
+export const MainSidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname.startsWith('/c/');
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  return (
+    <aside className="w-[68px] h-screen bg-[hsl(var(--slack-purple-dark))] flex flex-col items-center py-3 gap-2 border-r border-[hsl(var(--slack-purple-active))]">
+      <TooltipProvider delayDuration={0}>
+        {navItems.map((item) => (
+          <Tooltip key={item.path}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  'w-12 h-12 rounded-lg transition-colors',
+                  isActive(item.path)
+                    ? 'bg-[hsl(var(--slack-cyan))] text-foreground'
+                    : 'text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-foreground'
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{item.label}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </TooltipProvider>
+    </aside>
+  );
+};

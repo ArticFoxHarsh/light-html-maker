@@ -41,6 +41,7 @@ All colors MUST be HSL.
 
     /* Slack-specific colors */
     --slack-purple: 281 51% 18%;
+    --slack-purple-dark: 281 51% 14%;
     --slack-purple-hover: 281 51% 22%;
     --slack-purple-active: 281 51% 28%;
     --slack-aubergine: 293 41% 15%;

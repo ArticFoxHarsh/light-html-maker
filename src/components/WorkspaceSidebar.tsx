@@ -127,13 +127,13 @@ export const WorkspaceSidebar = () => {
     })
   );
 
-  // Set first channel as active on mount
+  // Set first channel as active on mount or navigate to active channel
   useEffect(() => {
     if (channels.length > 0 && !activeChannel) {
       setActiveChannel(channels[0].id);
       navigate(`/c/${channels[0].id}`);
     }
-  }, [channels, activeChannel, setActiveChannel]);
+  }, [channels, activeChannel, setActiveChannel, navigate]);
 
   const toggleSection = (section: string) => {
     setCollapsedSections(prev => ({

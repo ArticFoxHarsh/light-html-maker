@@ -6,12 +6,16 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { MessageArea } from "./components/MessageArea";
 import Auth from "./pages/Auth";
+import Index from "./pages/Index";
 import Threads from "./pages/Threads";
 import Activity from "./pages/Activity";
 import Starred from "./pages/Starred";
 import Directories from "./pages/Directories";
 import Huddles from "./pages/Huddles";
 import NewMessage from "./pages/NewMessage";
+import DMs from "./pages/DMs";
+import Files from "./pages/Files";
+import More from "./pages/More";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./hooks/useAuth";
 
@@ -25,7 +29,7 @@ const ProtectedRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<MessageArea />} />
+      <Route path="/" element={<Index />} />
       <Route path="/c/:channelId" element={<MessageArea />} />
       <Route path="/threads" element={<Threads />} />
       <Route path="/activity" element={<Activity />} />
@@ -33,6 +37,9 @@ const ProtectedRoutes = () => {
       <Route path="/directories" element={<Directories />} />
       <Route path="/huddles" element={<Huddles />} />
       <Route path="/new-message" element={<NewMessage />} />
+      <Route path="/dms" element={<DMs />} />
+      <Route path="/files" element={<Files />} />
+      <Route path="/more" element={<More />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
