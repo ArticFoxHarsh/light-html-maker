@@ -5,9 +5,32 @@ import { Card } from '@/components/ui/card';
 
 interface ChannelWelcomeProps {
   channelName: string;
+  channelType?: string;
 }
 
-export const ChannelWelcome = ({ channelName }: ChannelWelcomeProps) => {
+export const ChannelWelcome = ({ channelName, channelType = 'channel' }: ChannelWelcomeProps) => {
+  // For DMs, show a simple welcome message
+  if (channelType === 'dm') {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 mb-6 border-2 border-primary/20 shadow-lg">
+            <div className="text-4xl">👤</div>
+          </div>
+          <h1 className="text-4xl font-black mb-3 flex items-center justify-center gap-2">
+            <span>👋</span> This is your conversation with {channelName}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Send a message to start the conversation
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
   const templates = [
     {
       title: 'Run a project',

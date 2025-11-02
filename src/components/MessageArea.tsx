@@ -248,7 +248,7 @@ export const MessageArea = () => {
             </motion.div>
           </div>
         ) : messages.length === 0 ? (
-          <ChannelWelcome channelName={channel.name} />
+          <ChannelWelcome channelName={channel.name} channelType={channel.type} />
         ) : (
           <div className="p-5 space-y-2 max-w-6xl">
             {/* Channel Topic */}
@@ -365,7 +365,7 @@ export const MessageArea = () => {
                 ref={inputRef}
                 value={messageInput}
                 onChange={(e) => handleInputChange(e.target.value)}
-                placeholder={`Message #${channel.name}`}
+                placeholder={channel.type === 'dm' ? `Message @${channel.name}` : `Message #${channel.name}`}
                 className="w-full px-3 py-3 bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground resize-none min-h-[60px] max-h-[200px]"
                 onKeyDown={(e) => {
                   if (showMentions) {
