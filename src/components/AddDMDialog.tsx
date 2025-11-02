@@ -45,50 +45,39 @@ export const AddDMDialog = ({ open, onOpenChange }: AddDMDialogProps) => {
     if (!user) return;
 
     try {
-      // Check if DM already exists - fetch all DMs and filter locally
+      // Check if DM already exists
       const { data: existingChannels, error: checkError } = await supabase
         .from('channels')
-        .select('id, name, dm_users')
-        .eq('type', 'dm');
+        .select('id')
+        .eq('type', 'dm')
+        .contains('dm_users', [user.id, profileId]);
 
       if (checkError) throw checkError;
 
-      // Find existing DM with both users
-      const existingDM = existingChannels?.find(channel => {
-        const dmUsers = channel.dm_users || [];
-        return dmUsers.length === 2 && dmUsers.includes(user.id) && dmUsers.includes(profileId);
-      });
-
-      if (existingDM) {
+      if (existingChannels && existingChannels.length > 0) {
         toast({
-          title: 'Conversation already exists',
-          description: `Opening conversation with ${username}`,
+          title: 'DM already exists',
+          description: `You already have a conversation with ${username}`,
         });
         onOpenChange(false);
-        window.location.href = `/c/${existingDM.id}`;
         return;
       }
 
-      const { data, error } = await supabase.from('channels').insert({
+      const { error } = await supabase.from('channels').insert({
         name: username,
         type: 'dm',
         section: 'Direct messages',
         created_by: user.id,
         dm_users: [user.id, profileId],
-      }).select().single();
+      });
 
       if (error) throw error;
 
       toast({
-        title: 'Conversation started',
+        title: 'DM created',
         description: `Started conversation with ${username}`,
       });
       onOpenChange(false);
-      
-      // Navigate to the new DM
-      if (data) {
-        window.location.href = `/c/${data.id}`;
-      }
     } catch (error: any) {
       toast({
         title: 'Error',

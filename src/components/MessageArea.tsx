@@ -6,7 +6,6 @@ import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useChannels } from '@/hooks/useChannels';
 import { useMessages } from '@/hooks/useMessages';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChannelWelcome } from './ChannelWelcome';
@@ -14,14 +13,12 @@ import { MessageItem } from './MessageItem';
 import { FileUpload } from './FileUpload';
 import { EmojiPicker } from './EmojiPicker';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
 
 export const MessageArea = () => {
   const { activeChannel, toggleSidebar, sidebarCollapsed, setActiveChannel } = useWorkspaceStore();
   const { channels } = useChannels();
   const { user } = useAuth();
-  const { profile } = useProfile(user?.id);
-  const { messages, loading, sendMessage, deleteMessage } = useMessages(activeChannel, profile?.username);
+  const { messages, loading, sendMessage, deleteMessage } = useMessages(activeChannel);
   const [messageInput, setMessageInput] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [showMentions, setShowMentions] = useState(false);
@@ -73,54 +70,12 @@ export const MessageArea = () => {
     
     if ((!trimmedMessage && selectedFiles.length === 0) || !user) return;
 
-    try {
-      // Upload files to storage if any
-      let fileData = null;
-      if (selectedFiles.length > 0) {
-        const file = selectedFiles[0]; // Take first file for now
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('message-attachments')
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('message-attachments')
-          .getPublicUrl(fileName);
-
-        fileData = {
-          file_url: publicUrl,
-          file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
-        };
-      }
-
-      // Send message with file data
-      if (trimmedMessage || fileData) {
-        const { error } = await supabase.from('messages').insert({
-          channel_id: activeChannel,
-          user_id: user.id,
-          content: trimmedMessage || '',
-          ...fileData,
-        });
-
-        if (error) throw error;
-      }
-
-      setMessageInput('');
-      setSelectedFiles([]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to send message',
-        variant: 'destructive',
-      });
+    // TODO: Upload files to storage before sending message
+    if (trimmedMessage) {
+      await sendMessage(trimmedMessage, user.id);
     }
+    setMessageInput('');
+    setSelectedFiles([]);
   };
 
   const handleFileSelect = (files: File[]) => {

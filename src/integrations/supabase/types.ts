@@ -52,7 +52,6 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string | null
-          dm_users: string[] | null
           id: string
           name: string
           section: string | null
@@ -63,7 +62,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
-          dm_users?: string[] | null
           id?: string
           name: string
           section?: string | null
@@ -74,7 +72,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
-          dm_users?: string[] | null
           id?: string
           name?: string
           section?: string | null
@@ -86,36 +83,24 @@ export type Database = {
       messages: {
         Row: {
           channel_id: string
-          content: string | null
+          content: string
           created_at: string
-          file_name: string | null
-          file_size: number | null
-          file_type: string | null
-          file_url: string | null
           id: string
           updated_at: string
           user_id: string
         }
         Insert: {
           channel_id: string
-          content?: string | null
+          content: string
           created_at?: string
-          file_name?: string | null
-          file_size?: number | null
-          file_type?: string | null
-          file_url?: string | null
           id?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           channel_id?: string
-          content?: string | null
+          content?: string
           created_at?: string
-          file_name?: string | null
-          file_size?: number | null
-          file_type?: string | null
-          file_url?: string | null
           id?: string
           updated_at?: string
           user_id?: string
