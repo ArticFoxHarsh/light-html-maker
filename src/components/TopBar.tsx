@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, RotateCcw, Search, HelpCircle, Users, Gift, MoreVertical } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Search, HelpCircle, Users, Gift, MoreVertical, X, Bell, Clock, Smile, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState } from 'react';
 
 export const TopBar = () => {
@@ -82,70 +89,119 @@ export const TopBar = () => {
           <Users className="h-4 w-4 mr-1.5" />
           <span className="text-xs">{totalCount}</span>
         </Button>
-        <DropdownMenu open={helpOpen} onOpenChange={setHelpOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-[hsl(var(--slack-text-muted))] hover:text-foreground hover:bg-[hsl(var(--slack-purple-hover))]"
-            >
-              <HelpCircle className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 bg-popover z-50">
-            <div className="p-3 border-b border-border">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="How can we help?"
-                  className="w-full pl-10 bg-background border-border"
-                />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setHelpOpen(true)}
+          className="h-7 w-7 text-[hsl(var(--slack-text-muted))] hover:text-foreground hover:bg-[hsl(var(--slack-purple-hover))]"
+        >
+          <HelpCircle className="h-4 w-4" />
+        </Button>
+        
+        <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
+          <SheetContent side="right" className="w-[520px] p-0 bg-[#1A1D21] border-l border-[#424242]">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between p-4 border-b border-[#424242]">
+                <SheetTitle className="text-lg font-bold">Help</SheetTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setHelpOpen(false)}
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-[#2C2D30]"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
+              
+              <div className="p-4 border-b border-[#424242]">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="How can we help?"
+                    className="w-full pl-10 bg-[hsl(var(--slack-cyan))] border-[hsl(var(--slack-cyan))] text-foreground"
+                  />
+                </div>
+              </div>
+
+              <ScrollArea className="flex-1">
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-muted-foreground">✨ Discover more</span>
+                    <span className="text-xs text-muted-foreground">1/3</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <button className="p-4 bg-[#2C2D30] rounded-lg text-left hover:bg-[#353638] transition-colors">
+                      <div className="flex flex-col gap-2">
+                        <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg p-3 h-24 flex items-center justify-center">
+                          <div className="text-white text-xs font-bold">NEW</div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold mb-1">Quick start guide</p>
+                          <p className="text-xs text-muted-foreground">Learn the basics and get to work in Slack</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button className="p-4 bg-[#2C2D30] rounded-lg text-left hover:bg-[#353638] transition-colors">
+                      <div className="flex flex-col gap-2">
+                        <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg p-3 h-24 flex items-center justify-center">
+                          <div className="text-white text-xs font-bold">NEW</div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold mb-1">New layout for channels and DMs</p>
+                          <p className="text-xs text-muted-foreground">Add files, workflows and more to tabs</p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="mb-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-semibold text-muted-foreground">👁️ Explore help topics</span>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <button className="w-full flex items-center gap-3 p-3 rounded hover:bg-[#2C2D30] transition-colors text-left">
+                        <Bell className="h-4 w-4 text-red-500" />
+                        <span className="text-sm">Configure your Slack notifications</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 p-3 rounded hover:bg-[#2C2D30] transition-colors text-left">
+                        <Clock className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm">Set your Slack status and availability</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 p-3 rounded hover:bg-[#2C2D30] transition-colors text-left">
+                        <Bell className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">Set a reminder</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 p-3 rounded hover:bg-[#2C2D30] transition-colors text-left">
+                        <Smile className="h-4 w-4 text-yellow-500" />
+                        <span className="text-sm">Use emoji reactions</span>
+                      </button>
+                      <button className="w-full flex items-center gap-3 p-3 rounded hover:bg-[#2C2D30] transition-colors text-left">
+                        <Video className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm">Slack video tutorials</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-3 border-t border-[#424242]">
+                    <button className="text-sm text-primary hover:underline">
+                      Help requests →
+                    </button>
+                  </div>
+                  
+                  <div className="mt-4 flex justify-center">
+                    <Button className="bg-background text-foreground hover:bg-background/90">
+                      Contact us
+                    </Button>
+                  </div>
+                </div>
+              </ScrollArea>
             </div>
-            <div className="p-2">
-              <DropdownMenuItem className="flex items-center gap-3 p-3">
-                <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
-                  📚
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Quick start guide</div>
-                  <div className="text-xs text-muted-foreground">Learn the basics and get to work in Slack</div>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-3 p-3">
-                <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
-                  🎨
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">New layout for channels and DMs</div>
-                  <div className="text-xs text-muted-foreground">Add files, workflows and more to tabs</div>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center justify-between p-3">
-                <span className="text-sm">Configure your Slack notifications</span>
-                <span className="text-primary text-xs">🔔</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center justify-between p-3">
-                <span className="text-sm">Set your Slack status and availability</span>
-                <span className="text-primary text-xs">💎</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center justify-between p-3">
-                <span className="text-sm">Set a reminder</span>
-                <span className="text-primary text-xs">☁️</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center justify-between p-3">
-                <span className="text-sm">Use emoji reactions</span>
-                <span className="text-primary text-xs">😊</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center justify-between p-3">
-                <span className="text-sm">Slack video tutorials</span>
-                <span className="text-primary text-xs">💎</span>
-              </DropdownMenuItem>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </SheetContent>
+        </Sheet>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

@@ -13,9 +13,8 @@ interface SidebarHoverPanelProps {
 export const SidebarHoverPanel = ({ type, onClose }: SidebarHoverPanelProps) => {
   // Mock data - can be replaced with real data later
   const mockUsers = [
-    { id: '1', name: 'John Doe', status: 'online', initials: 'JD' },
-    { id: '2', name: 'Jane Smith', status: 'offline', initials: 'JS' },
-    { id: '3', name: 'Mike Johnson', status: 'online', initials: 'MJ' },
+    { id: '1', name: 'Abhimanyu Negi', status: 'online', initials: 'W', unread: 1 },
+    { id: '2', name: 'Harsh Paliwal (you)', status: 'online', initials: 'HP', isYou: true },
   ];
 
   const mockFiles = [
@@ -38,23 +37,29 @@ export const SidebarHoverPanel = ({ type, onClose }: SidebarHoverPanelProps) => 
             
             <ScrollArea className="flex-1">
               <div className="p-3">
+                <div className="mb-3 p-3 bg-[#2C2D30]/50 rounded-lg border border-dashed border-[#424242] flex items-start gap-3">
+                  <div className="text-2xl">🎯</div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium mb-1">Slack is better when everyone's here. Add your team and get the conversation started.</p>
+                  </div>
+                </div>
+                
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start gap-2 bg-transparent border-[#424242] hover:bg-[#2C2D30] text-foreground"
+                  className="w-full justify-center gap-2 bg-transparent border-[#424242] hover:bg-[#2C2D30] text-foreground mb-4"
                 >
-                  <Plus className="h-4 w-4" />
                   Add colleagues
                 </Button>
                 
-                <div className="mt-4 space-y-1">
+                <div className="space-y-1">
                   {mockUsers.map((user) => (
                     <button
                       key={user.id}
                       className="w-full flex items-center gap-3 p-2 rounded hover:bg-[#2C2D30] transition-colors text-left"
                     >
                       <div className="relative">
-                        <Avatar className="h-7 w-7 bg-[#2C2D30]">
-                          <AvatarFallback className="text-xs bg-[#2C2D30] text-foreground">
+                        <Avatar className="h-7 w-7 bg-[hsl(var(--slack-cyan))]">
+                          <AvatarFallback className="text-xs bg-[hsl(var(--slack-cyan))] text-background font-bold">
                             {user.initials}
                           </AvatarFallback>
                         </Avatar>
@@ -62,7 +67,19 @@ export const SidebarHoverPanel = ({ type, onClose }: SidebarHoverPanelProps) => 
                           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#1A1D21]" />
                         )}
                       </div>
-                      <span className="text-sm text-foreground">{user.name}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-foreground truncate">{user.name}</span>
+                          {user.unread && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold flex-shrink-0">
+                              {user.unread}
+                            </span>
+                          )}
+                        </div>
+                        {user.isYou && (
+                          <p className="text-xs text-muted-foreground mt-0.5">This is your space. Draft messages, create your to-do lists or keep links and files handy.</p>
+                        )}
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -83,27 +100,16 @@ export const SidebarHoverPanel = ({ type, onClose }: SidebarHoverPanelProps) => 
             </div>
             
             <ScrollArea className="flex-1">
-              <div className="p-3 space-y-1">
-                <button className="w-full flex items-center gap-3 p-2 rounded hover:bg-[#2C2D30] transition-colors text-left">
-                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Threads</span>
-                </button>
-                
-                <button className="w-full flex items-center gap-3 p-2 rounded hover:bg-[#2C2D30] transition-colors text-left">
-                  <Hash className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Huddles</span>
-                </button>
-                
-                <button className="w-full flex items-center gap-3 p-2 rounded hover:bg-[#2C2D30] transition-colors text-left">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Directories</span>
-                </button>
-
-                <div className="mt-6 p-3 rounded bg-[#2C2D30]/50 flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-medium">You've caught up with everything</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">No unread messages in your channels or threads</p>
+              <div className="p-3">
+                <div className="flex items-center justify-center min-h-[300px]">
+                  <div className="text-center max-w-[200px]">
+                    <div className="mb-3 flex justify-center">
+                      <div className="w-16 h-16 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 className="h-8 w-8 text-green-500" />
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium mb-1">You've caught up with everything.</p>
+                    <p className="text-xs text-muted-foreground">Looks like things are quiet for now. When there's new activity, you'll see it here.</p>
                   </div>
                 </div>
               </div>

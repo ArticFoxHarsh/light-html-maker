@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Bell, Files, MoreHorizontal } from 'lucide-react';
+import { Home, MessageSquare, Bell, Files, MoreHorizontal, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import {
 const navItems = [
   { icon: Home, label: 'Home', path: '/', showLabel: true, hasPanel: false },
   { icon: MessageSquare, label: 'DMs', path: '/dms', showLabel: true, hasPanel: true, panelType: 'dms' as const },
+  { icon: Zap, label: 'Activity', path: '/activity', showLabel: true, hasPanel: true, panelType: 'activity' as const },
   { icon: Files, label: 'Files', path: '/files', showLabel: true, hasPanel: true, panelType: 'files' as const },
   { icon: MoreHorizontal, label: 'More', path: '/more', showLabel: true, hasPanel: true, panelType: 'more' as const },
 ];
